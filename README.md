@@ -35,3 +35,9 @@ Le projet repose sur les composants suivants :
 
 ---
 
+## Démarrage du projet
+
+### 1. Lancer les conteneurs Docker
+
+```bash
+docker compose up --build -d
