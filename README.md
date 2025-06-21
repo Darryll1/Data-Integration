@@ -1,38 +1,42 @@
-# Projet d'Intégration de Données
+#  Projet Data Integration – Pipeline de Traitement Distribué
 
-## Description du Projet
-Ce projet est conçu pour gérer et intégrer des données issues d'enquêtes démographiques provenant de diverses sources, en surmontant des défis tels que les formats variés, les structures de données imprévisibles et les flux de données continus. 
+##  Objectif
 
-Le projet intègre des données provenant de l'enquête communautaire américaine de 2015, en utilisant spécifiquement :
+Ce projet met en œuvre une **architecture de traitement de données distribuée** autour d’un pipeline complet depuis la collecte jusqu’à l’analyse, en s’appuyant sur des technologies Big Data modernes. Le projet s’inscrit dans une logique d’**intégration continue, d’automatisation, de scalabilité** et de **monitoring**.
 
-- Le jeu de données `total-population` (diffusé en continu via Kafka),
-- `aggregate-household-income-in-the-past-12-months-in-2015-inflation-adjusted-dollars`,
-- `types-of-health-insurance-coverage-by-age`,
-- `self-employment-income-in-the-past-12-months-for-households`.
+---
 
-### Objectifs :
-1. Recevoir et intégrer en continu les données `total-population` diffusées via Kafka.
-2. Lire et intégrer les autres jeux de données stockés dans HDFS.
-3. Gérer l'intégration des données avec une gestion des erreurs et la possibilité de revenir à des versions précédentes en cas d'incohérences.
-4. Calculer et stocker des métriques significatives dans une base de données structurée.
+##  Architecture générale
 
-## Prérequis
-- Docker et Docker Compose
-- Python 3.x
-- Spark
-- HDFS
-## Ordre d'exécution 
-## Produire les données avec Kafka : Exécutez le script producer.py pour envoyer des données dans le topic Kafka :
-cd population_survey_project/kafka_producer
-python producer.py
+Le projet repose sur les composants suivants :
 
-## Lire les données dans HDFS : Lancez hdfs_reader.py pour stocker les données dans HDFS :
-cd ../hdfs_data
-python hdfs_reader.py
+- **Kafka** : ingestion temps réel des données via un producteur Python
+- **Spark Streaming** : traitement distribué des données entrantes
+- **HDFS** : stockage distribué des fichiers sources et agrégés
+- **Airflow** : orchestration des tâches de traitement batch
+- **FastAPI** : exposer des résultats via une API REST
+- **Prometheus & Grafana** : monitoring et visualisation des métriques
+- **Docker Compose** : containerisation de l’ensemble des services
 
-## Consommer et traiter les données : Le script consumer.py consomme les données de Kafka et fait des jointures avec les données récupérées depuis HDFS et les traite via Spark Streaming :
-cd ../spark_streaming
-python consumer.py
+---
 
-## Calculer les métriques : Enfin, utilisez metrics_calculation.py pour générer des analyses basées sur les données traitées :
-python metrics_calculation.py
+##  Modules principaux
+
+| Dossier/Fichier | Description |
+|------------------|-------------|
+| `kafka_producer/producer.py` | Envoie les messages dans Kafka |
+| `spark_streaming/consumer.py` | Consomme les messages Kafka et les traite avec Spark |
+| `hdfs_data/hdfs_reader.py` | Lecture des fichiers CSV stockés dans HDFS |
+| `spark_streaming/cube_population.py` | Création de cubes analytiques sur les données |
+| `spark_streaming/metrics_calculation.py` | Calcul de métriques à exporter |
+| `api/main.py` | API REST en FastAPI pour exposer les données |
+| `dags/data_pipeline_dag.py` | DAG Airflow pour orchestrer les étapes batch |
+| `docker-compose.yml` | Lancement coordonné de tous les conteneurs |
+| `prometheus.yml` | Configuration du monitoring avec Prometheus |
+
+---
+
+##  Données utilisées
+
+Les fichiers CSV sources sont basés sur des données démographiques synthétiques, disponibles dans :
+
