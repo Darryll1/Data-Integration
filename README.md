@@ -28,15 +28,10 @@ Le projet repose sur les composants suivants :
 | `spark_streaming/consumer.py` | Consomme les messages Kafka et les traite avec Spark |
 | `hdfs_data/hdfs_reader.py` | Lecture des fichiers CSV stockés dans HDFS |
 | `spark_streaming/cube_population.py` | Création de cubes analytiques sur les données |
-| `spark_streaming/metrics_calculation.py` | Calcul de métriques à exporter |
 | `api/main.py` | API REST en FastAPI pour exposer les données |
 | `dags/data_pipeline_dag.py` | DAG Airflow pour orchestrer les étapes batch |
 | `docker-compose.yml` | Lancement coordonné de tous les conteneurs |
 | `prometheus.yml` | Configuration du monitoring avec Prometheus |
 
 ---
-
-##  Données utilisées
-
-Les fichiers CSV sources sont basés sur des données démographiques synthétiques, disponibles dans :
 
