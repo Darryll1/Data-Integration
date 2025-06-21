@@ -35,3 +35,55 @@ Le projet repose sur les composants suivants :
 
 ---
 
+Démarrage du projet
+ 
+### 1. Lancer les conteneurs Docker
+ 
+```bash
+docker compose up --build -d
+ 
+Cela démarre tous les services nécessaires : Kafka, Spark, Airflow, FastAPI, Prometheus, Grafana…
+ 
+Accéder aux interfaces
+ 
+Composant	URL
+API FastAPI	http://localhost:8000/docs
+Grafana	http://localhost:3000 (admin/admin)
+Prometheus	http://localhost:9090
+Airflow	http://localhost:8080 (admin/admin)
+ 
+Monitoring
+Prometheus collecte les métriques exposées par le traitement Spark Streaming.
+Grafana visualise ces métriques (ex. messages traités, erreurs, durée par message)
+## Traitement des données – Pipeline
+1. Kafka Producer
+Envoie des lignes de total-population.csv en boucle toutes les 10 secondes dans le topic population_data.
+2. HDFS Reader
+Lit plusieurs fichiers CSV (revenus, assurance santé, travail indépendant)
+Nettoie, harmonise et effectue une jointure sur l’ID
+Génère un fichier enrichi all_data_joined.csv
+3. Spark Consumer
+Consomme les messages Kafka
+Enrichit les données en rejoignant avec all_data_joined.csv
+Nettoie, transforme et insère les résultats dans donnees_formatées (base SQLite)
+Expose des métriques Prometheus
+4. Cube Generator
+Calcule des cubes par tranche d'âge, secteur ou revenus
+Agrège les données par quartier (Neighborhood)
+Stocke les cubes dans cube_analytics.db
+## API FastAPI
+L’API REST expose les données agrégées :
+Endpoint	Description
+/api/health-insurance/18-34	Santé 18–34 ans
+/api/self-employment	Revenus indépendants
+/api/income	Revenu global
+ 
+Toutes les données sont lues directement dans la base cube_analytics.db.
+Orchestration Airflow
+Le DAG Airflow exécute automatiquement les étapes suivantes :
+start_producer : Simulation Kafka
+transform_hdfs : Nettoyage et jointure des données HDFS
+start_consumer : Traitement Spark Streaming
+compute_cube : Calcul et stockage des cubes
+Planification : quotidienne (schedule_interval="daily")
+
